@@ -1,5 +1,7 @@
 # RSICalc
 
+[![Join the chat at https://gitter.im/vsayer/rsicalc](https://badges.gitter.im/vsayer/rsicalc.svg)](https://gitter.im/vsayer/rsicalc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 *Relative Strength Index Calculator*
 
 RSICalc calculates RSI values for a set of specified stock ticker symbols using yahoo finance. The RSI or Relative Strength Index of a stock tells one if a stock is oversold or overbought. General consensus is if the value falls below 30, it is oversold; if it the values exceeds 70, it is overbought. It is a way of indicating the momentum of a stock.
