@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+
+import argparse
+import datetime
+
+from yahoo_finance import Share
+
+def calculate_rsi(symbols, period, last, row):
+	"""Calculate the relative strength index using yahoo finance."""
+	# yahoo finance starts back at roughly 22 months (~660 + 20 days = 680 ok)
+	start_date = str(datetime.date.today() - datetime.timedelta(days=680))
+	end_date = str(datetime.date.today())
+	relative_strength_indices_dict = {}
+	for symbol in symbols:
+		historical_info = Share(symbol).get_historical(start_date, end_date)
+
+		# cannot exceed total retrieved data
+		assert len(historical_info) >= period+last
+
+		# filter out and reverse order of adjusted close prices
+		adjusted_close_prices = [float(x['Adj_Close']) for x in historical_info]
+		adjusted_close_prices.reverse()
+
+		# get day-to-day changes of adjusted close prices
+		changes = [y - x for x, y in zip(adjusted_close_prices, adjusted_close_prices[1:])]
+
+		# add positives to gains bucket, negatives to losses bucket
+		gains, losses = [], []
+		for change in changes:
+			if change > 0:
+				gains.append(change)
+				losses.append(0)
+			elif change < 0:
+				losses.append(-change)
+				gains.append(0)
+			else:
+				gains.append(0)
+				losses.append(0)
+
+		# calculate average gains and losses
+		avg_gains, avg_losses = [], []
+		avg_gains.append(sum(gains[:period])/period)
+		for gain in gains[period:]:
+			avg_gains.append((avg_gains[-1]*(period-1)+gain)/period)
+		avg_losses.append(sum(losses[:period])/period)
+		for loss in losses[period:]:
+			avg_losses.append((avg_losses[-1]*(period-1)+loss)/period)
+
+		# calculate relative strengths
+		relative_strengths = [avg_gain/avg_loss for avg_gain, avg_loss in zip(avg_gains, avg_losses)]
+
+		# calculate relative strength indices
+		relative_strength_indices = [100-(100/(1+s)) for s in relative_strengths]
+
+		# add result to dictionary
+		relative_strength_indices_dict[symbol] = relative_strength_indices[-last:]
+
+	# print either in row or columnar fashion
+	if row:
+		for key in relative_strength_indices_dict.keys():
+			print key, ':', relative_strength_indices_dict[key]
+	else:
+		print ','.join(relative_strength_indices_dict.keys())
+		for i in range(0, len(relative_strength_indices_dict[relative_strength_indices_dict.keys()[0]])):
+			print ','.join([str(relative_strength_indices_dict[x][i]) for x in relative_strength_indices_dict.keys()])
+
+def parse():
+	"""Parse arguments."""
+	parser = argparse.ArgumentParser(description='Calculate the relative strength index using yahoo finance.')
+	parser.add_argument('symbols', metavar='S', type=str, nargs='+',
+		help='a ticker symbol')
+	# yahoo finance can have granularity smaller than days which this tool doesn't support
+	# i.e., this will not give you the values on the 1d and 5d graphs
+	parser.add_argument('--period', type=int, dest='period', default=14,
+		help='number of trading days to calculate rsi over (default: 14)')
+	# 1m on yahoo is roughly 22 trading days (30 days - 8 weekend days)
+	parser.add_argument('--last', type=int, dest='last', default=22,
+		help='number of the last N rsi values to print to stdout (default: 22)')
+	parser.add_argument('--row', dest='row', action='store_true',
+		help='print output for each symbol in row fashion (default: columnar')
+	args = parser.parse_args()
+	calculate_rsi(args.symbols, args.period, args.last, args.row)
+
+if __name__ == '__main__':
+	parse()
