@@ -42,17 +42,21 @@ EDITME
 ## Develop
 If you have ideas to further develop RSICalc, please clone this repo and send over a pull request! Thanks!
 
+## TODO
+* Add gnuplot example
+* Add caching mechanism
+
 ## Disclaimers
-#### General
+#### GENERAL
 **RSICalc MAKES NO GUARANTEE OF VALIDITY**
 
-#### Content
+#### CONTENT
 **RSICalc CONTAINS CONTENT THAT MAY BE OBJECTIONABLE**
 
-#### Financial
+#### FINANCIAL
 **RSICalc DOES NOT GIVE FINANCIAL OPINIONS**
 
-#### Risk
+#### RISK
 **USE RSICalc AT YOUR OWN RISK**
 
 ## License
