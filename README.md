@@ -8,6 +8,9 @@ RSICalc calculates RSI values for a set of specified stock ticker symbols using 
 
 Since this tool uses yahoo historical values to calculate the RSI, there is not enough granularity to cover the 1d and 5d graphs yahoo finance shows. So a 14-period RSI here really is a 14-period (days) RSI. The output generated here should be consistent with 1m and longer time intervals on yahoo finance.
 
+## Why?
+This tool was created so one did not have open up endless web tabs on financial source sites to check RSI values for different symbols. It was made to combine all that data into one view.
+
 ## Install
 Install RSICalc using pip:
 ```shell
@@ -38,6 +41,19 @@ EDITME
 
 ## Develop
 If you have ideas to further develop RSICalc, please clone this repo and send over a pull request! Thanks!
+
+## Disclaimers
+#### General
+**RSICalc MAKES NO GUARANTEE OF VALIDITY**
+
+#### Content
+**RSICalc CONTAINS CONTENT THAT MAY BE OBJECTIONABLE**
+
+#### Financial
+**RSICalc DOES NOT GIVE FINANCIAL OPINIONS**
+
+#### Risk
+**USE RSICalc AT YOUR OWN RISK**
 
 ## License
 [BSD 3-Clause](LICENSE)
