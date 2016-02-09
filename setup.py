@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='rsicalc',
-      version='0.2',
+      version='0.5',
       description='Relative Strength Index Calculator',
       author='Vivek Ayer',
       author_email='ayer@pobox.com',
