@@ -43,10 +43,9 @@ rsicalc GOOG FB AAPL > /tmp/rsicalc.out; N=$(awk 'NR==1{print NF}' /tmp/rsicalc.
 If you have ideas to further develop RSICalc, please clone this repo and send over a pull request! Thanks!
 
 ## TODO
-* Add gnuplot example
-* Purify refactor
 * Add logging
 * Add tests
+# Refactor
 
 ## Disclaimers
 #### GENERAL
