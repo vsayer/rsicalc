@@ -43,9 +43,15 @@ def get_historical(symbol, start_date, end_date):
 		else: # clear cache that is too old
 			historical_info_cache = []
 
-	# query and append to cache only under certain conditions
+	# query and append to cache only if satisfies all below conditions:
+	# - start date must be less than or equal to end date
+	# - either there is no last available date (no cache) or the last available date is less than end date
+	# - NOT if start date is equal to end date and end date is equal to Saturday or Sunday
+	# NOTE: will not protect against queries on holidays or major disruptions
 	historical_info = []
-	if (start_date <= end_date) and ((not last_available_date) or (last_available_date < end_date)):
+	if (start_date <= end_date) and \
+		((not last_available_date) or (last_available_date < end_date)) and \
+		(not ((start_date == end_date) and (end_date.weekday() in (5, 6)))):
 		# convert start and end date back to strings
 		start_date = start_date.strftime("%Y-%m-%d")
 		end_date = end_date.strftime("%Y-%m-%d")
