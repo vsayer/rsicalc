@@ -44,8 +44,8 @@ If you have ideas to further develop RSICalc, please clone this repo and send ov
 
 ## TODO
 * Add gnuplot example
-* Add caching mechanism
 * Purify refactor
+* Add logging
 * Add tests
 
 ## Disclaimers

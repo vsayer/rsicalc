@@ -1,18 +1,87 @@
 #!/usr/bin/env python
 
 import argparse
+import cPickle as pickle
 import datetime
+import os
 
 from yahoo_finance import Share
 
+def get_historical(symbol, start_date, end_date):
+	"""Get historical info."""
+	# historical info cache is a list of dicts
+	historical_info_cache = []
+
+	# convert relevant dates
+	start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+	end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+	last_available_date = None
+
+	# try to open pickle file
+	rsicalc_directory = os.path.expanduser('~/.rsicalc')
+	historical_info_cache_file_path = os.path.join(rsicalc_directory, symbol) + '.pickle'
+	try:
+		historical_info_cache_file = open(historical_info_cache_file_path, 'rb')
+
+		# keep unpickling until EOF reached
+		while True:
+			try:
+				historical_info_cache.append(pickle.load(historical_info_cache_file))
+			except EOFError:
+				break
+		historical_info_cache_file.close()
+	except IOError:
+		pass
+
+	# check the cache if non-empty
+	if historical_info_cache:
+		last_available_date = datetime.datetime.strptime(historical_info_cache[0]['Date'], '%Y-%m-%d')
+
+		# reset start date if less than or equal to last available date
+		if start_date <= last_available_date:
+			start_date = last_available_date + datetime.timedelta(days=1)
+		else: # clear cache that is too old
+			historical_info_cache = []
+
+	# query and append to cache only under certain conditions
+	historical_info = []
+	if (start_date <= end_date) and ((not last_available_date) or (last_available_date < end_date)):
+		# convert start and end date back to strings
+		start_date = start_date.strftime("%Y-%m-%d")
+		end_date = end_date.strftime("%Y-%m-%d")
+
+		# query yahoo
+		historical_info = Share(symbol).get_historical(start_date, end_date)
+
+		# if there was a non-empty result
+		if historical_info:
+			# open pickle file for overwriting
+			historical_info_cache_file = open(historical_info_cache_file_path, 'wb')
+			
+			# prepend historical_info to historical_info_cache
+			historical_info_cache[:0] = historical_info
+
+			# pickle back to disk
+			for info in historical_info_cache:
+				pickle.dump(info, historical_info_cache_file)
+			historical_info_cache_file.close()
+
+	# return result
+	return historical_info_cache
+
 def calculate_rsi(symbols, period, last, row):
 	"""Calculate the relative strength index using yahoo finance."""
+	# create .rsicalc if it does not exist
+	rsicalc_directory = os.path.expanduser('~/.rsicalc')
+	if not os.path.exists(rsicalc_directory):
+		os.mkdir(rsicalc_directory)
+
 	# yahoo finance starts back at roughly 22 months (~660 + 20 days = 680 ok)
 	start_date = str(datetime.date.today() - datetime.timedelta(days=680))
 	end_date = str(datetime.date.today())
 	relative_strength_indices_dict = {}
 	for symbol in symbols:
-		historical_info = Share(symbol).get_historical(start_date, end_date)
+		historical_info = get_historical(symbol, start_date, end_date)
 
 		# cannot exceed total retrieved data
 		assert len(historical_info) >= period+last
