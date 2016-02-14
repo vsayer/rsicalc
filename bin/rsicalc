@@ -75,7 +75,7 @@ def get_historical(symbol, start_date, end_date):
 	# return result
 	return historical_info_cache
 
-def calculate_rsi(symbols, period, last, row):
+def calculate_rsi(symbols, period, last, row, separator):
 	"""Calculate the relative strength index using yahoo finance."""
 	# create .rsicalc if it does not exist
 	rsicalc_directory = os.path.expanduser('~/.rsicalc')
@@ -135,9 +135,9 @@ def calculate_rsi(symbols, period, last, row):
 		for key in relative_strength_indices_dict.keys():
 			print key, ':', relative_strength_indices_dict[key]
 	else:
-		print ','.join(relative_strength_indices_dict.keys())
+		print separator.join(relative_strength_indices_dict.keys())
 		for i in range(0, len(relative_strength_indices_dict[relative_strength_indices_dict.keys()[0]])):
-			print ','.join([str(relative_strength_indices_dict[x][i]) for x in relative_strength_indices_dict.keys()])
+			print separator.join([str(relative_strength_indices_dict[x][i]) for x in relative_strength_indices_dict.keys()])
 
 def parse():
 	"""Parse arguments."""
@@ -153,8 +153,10 @@ def parse():
 		help='number of the last N rsi values to print to stdout (default: 22)')
 	parser.add_argument('--row', dest='row', action='store_true',
 		help='print output for each symbol in row fashion (default: columnar')
+	parser.add_argument('--separator', dest='separator', default=' ',
+		help='separator used for columnar output (default: space)')
 	args = parser.parse_args()
-	calculate_rsi(args.symbols, args.period, args.last, args.row)
+	calculate_rsi(args.symbols, args.period, args.last, args.row, args.separator)
 
 if __name__ == '__main__':
 	parse()

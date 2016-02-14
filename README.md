@@ -34,9 +34,9 @@ rsicalc --row GOOG FB AAPL
 ```
 
 ## Tricks
-#### sending stdout to gnuplot
+#### plot via awk and gnuplot
 ```shell
-EDITME
+rsicalc GOOG FB AAPL > /tmp/rsicalc.out; N=$(awk 'NR==1{print NF}' /tmp/rsicalc.out); gnuplot -p -e "plot for [i=1:$N+1] '/tmp/rsicalc.out' u 0:i w l t columnheader(i)"
 ```
 
 ## Develop
